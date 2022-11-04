@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AppService } from './app.service';
         synchronize: configService.get<string>('DATABASE') ? undefined : true,
       })
     }),
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
