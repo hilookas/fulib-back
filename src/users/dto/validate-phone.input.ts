@@ -1,12 +1,9 @@
 import { IsDefined } from 'class-validator';
 
-export class CreateUserDto {
-  @IsDefined()
-  name: string;
-
+export class ValidatePhoneInput {
   @IsDefined()
   phone: string;
 
   @IsDefined()
-  address: string;
+  code: string;
 }
