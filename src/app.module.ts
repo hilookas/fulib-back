@@ -21,7 +21,8 @@ import { BooksModule } from './books/books.module';
           ? configService.get<string>('DATABASE')
           : join(process.cwd(), 'database.sqlite'),
         autoLoadEntities: true,
-        synchronize: configService.get<string>('DATABASE') ? undefined : true,
+        // synchronize: configService.get<string>('DATABASE') ? undefined : true,
+        synchronize: true, // Always update prod database
       })
     }),
     UsersModule,
