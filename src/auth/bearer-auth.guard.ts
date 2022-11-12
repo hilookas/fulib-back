@@ -8,7 +8,12 @@ export const CurrentUser = createParamDecorator(
 );
 
 @Injectable()
-export class BearerAuthGuard extends AuthGuard('bearer') {}
+export class BearerAuthGuard extends AuthGuard('bearer') {
+  handleRequest(err: any, user: any, info: any, context: ExecutionContext, status?: any) {
+    if (user instanceof Error) throw user;
+    return super.handleRequest(err, user, info, context, status);
+  }
+}
 
 export class WeakBearerAuthGuard extends BearerAuthGuard {
   // https://stackoverflow.com/questions/63257879/get-current-user-in-nestjs-on-a-route-without-an-authguard
