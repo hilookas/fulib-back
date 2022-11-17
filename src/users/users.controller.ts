@@ -6,13 +6,15 @@ import { UsersService } from './users.service';
 import { User } from './user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ValidatePhoneInput } from './dto/validate-phone.input';
+import { ValidatePhoneInput } from '../phone-validations/dto/validate-phone.input';
+import { PhoneValidationsService } from '../phone-validations/phone-validations.service';
 
 @Controller('users')
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly phoneValidationsService: PhoneValidationsService
   ) {}
 
   // https://github.com/nestjs/nest/issues/995
@@ -25,9 +27,10 @@ export class UsersController {
 
   @Post('login')
   async login(@Body() validatePhoneInput: ValidatePhoneInput) {
-    if (validatePhoneInput.code !== '666666') {
-      throw new BadRequestException('Wrong code');
+    if (!(await this.phoneValidationsService.check(validatePhoneInput.phone, validatePhoneInput.code))) {
+      throw new BadRequestException;
     }
+    await this.phoneValidationsService.remove(validatePhoneInput.phone);
     const user = await this.usersService.findOneWithValidatedPhone(validatePhoneInput.phone);
     if (!user) {
       throw new BadRequestException('User not found');

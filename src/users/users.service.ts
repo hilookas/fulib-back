@@ -6,6 +6,7 @@ import { AuthUser } from '../auth/auth-user.entity';
 import { User } from './user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+const isChinesePhoneNumber = require('is-chinese-phone-number');
 
 @Injectable()
 export class UsersService {
@@ -61,6 +62,9 @@ export class UsersService {
     if (await this.findOneWithValidatedPhone(createUserDto.phone)) {
       throw new BadRequestException('Phone has been validated');
     }
+    if (!isChinesePhoneNumber.mobile(createUserDto.phone)) {
+      throw new BadRequestException('Wrong phone');
+    }
     user.phone = createUserDto.phone;
 
     user.address = createUserDto.address;
@@ -83,6 +87,9 @@ export class UsersService {
     if (updateUserDto.phone !== user.phone) {
       if (await this.findOneWithValidatedPhone(updateUserDto.phone)) {
         throw new BadRequestException('Phone has been validated');
+      }
+      if (!isChinesePhoneNumber.mobile(updateUserDto.phone)) {
+        throw new BadRequestException('Wrong phone');
       }
       user.phone = updateUserDto.phone;
     }
