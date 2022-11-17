@@ -1,6 +1,6 @@
-import { Injectable, ForbiddenException, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { AuthUser } from '../auth/auth-user.entity';
 import { Book } from './book.entity';
 import { CreateBookDto } from './dto/create-book.dto';
@@ -42,8 +42,15 @@ export class BooksService {
     }
   }
 
-  async findAll(curUser: AuthUser): Promise<Book[]> {
-    return (await this.booksRepository.find({ relations: [ 'borrowedByUser', 'user' ] })).map(x => this.filterResult(x, curUser)).filter(x => x !== null);
+  async findAll(query: { isbn: string, name: string, author: string }, curUser: AuthUser): Promise<Book[]> {
+    return (await this.booksRepository.find({
+      where: {
+        isbn: query.isbn ? Like('%' + query.isbn + '%') : undefined,
+        name: query.name ? Like('%' + query.name + '%') : undefined,
+        author: query.author ? Like('%' + query.author + '%') : undefined,
+      },
+      relations: [ 'borrowedByUser', 'user' ]
+    })).map(x => this.filterResult(x, curUser)).filter(x => x !== null);
   }
 
   findOne(id: number): Promise<Book> {
@@ -144,8 +151,6 @@ export class BooksService {
     }
 
     book.borrowedByUser = Object.assign(new User, omit(curUser, 'token'));
-
-    console.dir(book)
 
     return this.filterResult(await this.booksRepository.save(book), curUser);
   }

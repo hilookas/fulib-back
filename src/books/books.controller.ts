@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, BadRequestException, ParseIntPipe, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, NotFoundException, Query } from '@nestjs/common';
 import { CurrentUser, BearerAuthGuard } from '../auth/bearer-auth.guard';
 import { AuthUser } from '../auth/auth-user.entity';
 import { BooksService } from './books.service';
@@ -13,8 +13,8 @@ export class BooksController {
 
   @Get()
   @UseGuards(BearerAuthGuard)
-  findAll(@CurrentUser() curUser: AuthUser) {
-    return this.booksService.findAll(curUser);
+  findAll(@Query('isbn') isbn: string, @Query('name') name: string, @Query('author') author: string, @CurrentUser() curUser: AuthUser) {
+    return this.booksService.findAll({ isbn, name, author }, curUser);
   }
 
   @Get(':id')
